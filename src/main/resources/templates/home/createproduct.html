@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>P Store - Tạo sản phẩm</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <!-- Favicon -->
+    <link th:href="@{/images/favicon.ico}" rel="icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap"
+          rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/lib/slick/slick.css}" rel="stylesheet">
+    <link th:href="@{/lib/slick/slick-theme.css}" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link th:href="@{/css/stylehome.css}" rel="stylesheet">
+</head>
+
+<body>
+
+<div th:replace="home/index::header_home"></div>
+<div style="height: 150px;"></div>
+<div class="breadcrumb-wrap">
+    <div class="container-fluid">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Pstore</a></li>
+            <li class="breadcrumb-item active">Tạo sản phẩm</li>
+        </ul>
+    </div>
+</div>
+<!-- Checkout -->
+<div class="checkout">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="checkout-inner" style="width: 147%">
+                    <button type="button" class="btn btn-primary mb-2 btn_showformcreateproduct">Tạo sản phẩm</button>
+                    <div class="billing-address col align-items-center " th:class="formcreateproduct"
+                         style="display: none">
+                        <h2>Thông tin sản phẩm</h2>
+                        <form class="col pl-0" th:action="@{/api/products/create}" method="post"
+                              th:object="${product}" enctype="multipart/form-data">
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" placeholder="Tên sản phẩm" th:field="*{name}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <textarea style="display: block; width: 100%; white-space: pre-line;" class="form-control" placeholder="Mô tả"
+                                           th:field="*{description}"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" placeholder="Giá gốc" th:field="*{costPrice}" oninput="validateMoneyNumber(this)" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" placeholder="Giá sale"
+                                       th:field="*{salePrice}" oninput="validateMoneyNumber(this)" required>
+                            </div>
+                            <div class="col-md-12">
+                                <input class="form-control w-50" type="number" placeholder="Số lượng"
+                                       th:field="*{currentQuantity}">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Danh mục</label>
+                                <select class="custom-select" th:field="*{categoryId}">
+                                    <option selected th:text="${categories.get(0).getName()}"
+                                            th:value="${categories.get(0).id}"></option>
+                                    <option th:each="category:${categories}" th:text="${category.name}"
+                                            th:value="${category.id}">Afghanistan
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Chọn ảnh</label>
+                                <input type="file" name="imageProduct" id="imageProduct">
+                            </div>
+                            <input type="hidden" th:field="*{sellerId}" id="sellerIdInput" />
+                            <button type="submit" class="btn btn-success mt-4">Tạo</button>
+                        </form>
+
+                    </div>
+                    <div class="billing-address col align-items-center " th:class="formeditproduct"
+                         th:if="${showformedit}">
+                        <h2>Chỉnh sửa sản phẩm</h2>
+                        <form class="col pl-0"  method="post" th:action="@{/api/products/edit/(id=${productEdit.id})}"
+                              th:object="${product}" enctype="multipart/form-data">
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" th:placeholder="${productEdit.getName()}" th:field="*{name}">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <textarea class="form-control" th:placeholder="${productEdit.getDescription()}"
+                                           th:field="*{description}"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" pattern="[0-9]+$" oninput="validateMoneyNumber(this)" th:placeholder="${productEdit.getCostPrice()}" th:field="*{costPrice}">
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" pattern="[0-9]+"  th:placeholder="${productEdit.getSalePrice()} "
+                                       th:field="*{salePrice}" oninput="validateMoneyNumber(this)">
+                            </div>
+                            <div class="col-md-12">
+                                <input class="form-control w-50" type="number" th:placeholder="${productEdit.getCurrentQuantity()}"
+                                       th:field="*{currentQuantity}">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Danh mục</label>
+                                <select class="custom-select" th:field="*{categoryId}">
+                                    <option selected th:text="${productEdit.getCategoryEntity().getName()}"
+                                            th:value="${categories.get(0).id}"></option>
+                                    <option th:each="category:${categories}" th:text="${category.name}"
+                                            th:value="${category.id}">Afghanistan
+                                    </option>
+                                </select>
+                            </div>
+                            <img th:src = "${productEdit.getImage_url()}" style="width: 50px;height: 50px">
+                            <div class="col-md-6">
+                                <label>Chọn ảnh</label>
+                                <input type="file" name="imageProduct">
+                            </div>
+                            <button type="submit" class="btn btn-success mt-4">Cập nhật</button>
+                        </form>
+
+                    </div>
+                    <h2 th:class="p-4">Tất cả sản phẩm</h2>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th >Mô tả</th>
+                                <th>Giá</th>
+                                <th>Giá sale</th>
+                                <th>Ảnh</th>
+                                <th>Danh mục</th>
+                                <th>Số lượng</th>
+                                <th>Lượt thích</th>
+                                <th>Hoạt động</th>
+                                <th>Ẩn</th>
+                                <th>Chỉnh sửa</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="product,index:${allproducts}">
+                                <td th:text="${index.count}"></td>
+                                <td th:text="${product.getName()}"></td>
+                                <td th:text="${#strings.abbreviate(product.getDescription(), 120)}"></td>
+<!--                                <td th:text="${product.getDescription()}"></td>-->
+                                <td th:text="${product.getCostPriceFormat()}"></td>
+                                <td th:text="${product.getSalePriceFormat()}"></td>
+                                <td >
+                                    <img th:src = "${product.getImage_url()}" style="width: 50px;height: 50px"/>
+                                </td>
+                                <td th:text="${categories.get(product.getCategoryEntity().getId() - 1).getName()}"></td>
+                                <td th:text="${product.getCurrentQuantity()}"></td>
+                                <td th:text="${product.getLikes()}"></td>
+                                <td>
+                                    <div type="button" class="btn btn-outline-success"
+                                         style="color: #34ce57; border:1.5px solid #34ce57;background: #34ce57;color: black"
+                                         th:if="${product.is_actived}"
+                                    >Active
+                                    </div>
+                                    <a th:if="${!product.is_actived}" th:href="@{/api/products/active/(id=${product.getId()})}">
+                                        <div type="button" class="btn btn-outline-success"
+                                             style="color: #34ce57; border:1.5px solid #34ce57" disabled
+                                        >Active
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <div type="button" class="btn btn-outline-success"
+                                         style="color: red; border:1.5px solid red;background: red ;color: black"
+                                         th:if="${!product.is_actived}"
+                                    >Hidden
+                                    </div>
+                                    <a th:if="${product.is_actived}" th:href="@{/api/products/delete/(id=${product.getId()})}">
+                                        <div type="button" class="btn btn-outline-danger"
+                                             style="color: red; border:1.5px solid red" disabled
+                                        >Hidden
+                                        </div>
+                                    </a>
+                                </td>
+                                <td th:class="btneditproduct">
+                                    <a th:href="@{/api/products/edit/(id=${product.getId()})}">
+                                        <img class="ionicon md" style="width: 50px; height: 50px" th:src="@{/images/edit.svg}">
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- Footer -->
+<div class="footer-bottom" style="margin-top:150px">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 copyright">
+                <p>Copyright &copy; Group 4.03</p>
+            </div>
+
+            <div class="col-md-6 template-by">
+                <a href="https://portal.ptit.edu.vn/">Posts and Telecommunications Institute of Technology</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Back to Top -->
+<a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+
+<!-- JavaScript-->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/lib/easing/easing.min.js"></script>
+<script src="/lib/slick/slick.min.js"></script>
+
+<!-- Template Javascript -->
+<script src="/images/main.js"></script>
+<script>
+    getUserNameFromCookie()
+    function validateMoneyNumber(input) {
+        var phoneNumber = input.value;
+        var isValid = /^[0-9]+$/.test(phoneNumber);
+
+        if (!isValid) {
+            input.setCustomValidity('Số tiền không hợp lệ!');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+    function getUserId() {
+        var cookies = document.cookie.split(';');
+        var userId = '';
+
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.startsWith('userId=')) {
+                userId = cookie.substring('userId='.length, cookie.length);
+                break;
+            }
+        }
+        return userId;
+    }
+    const userId = getUserId();
+    document.getElementById("sellerIdInput").value = userId;
+    document.querySelector("form").addEventListener("submit", function (event) {
+        if (!document.getElementById("sellerIdInput").value) {
+            event.preventDefault();
+            console.error("Lỗi");
+        }
+    });
+    $.ajax({
+        type: "GET",
+        url: "/api/products/create/" + {usedId},
+        data: { userId: userId },
+    }).done(function (res) {
+    }).fail(function (error) {
+    });
+
+</script>
+</body>
+</html>

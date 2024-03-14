@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head th:fragment="head">
+        <meta charset="utf-8">
+        <title>P Store</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+        <!-- Favicon -->
+        <link th:href="@{/images/favicon.ico}" rel="icon">
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap" rel="stylesheet">
+        <!-- CSS -->
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+        <link th:href="@{/lib/slick/slick.css}" rel="stylesheet">
+        <link th:href="@{/lib/slick/slick-theme.css}" rel="stylesheet">
+        <!--Stylesheet -->
+        <link th:href="@{/css/stylehome.css}" rel="stylesheet">
+    </head>
+
+    <body>
+        <!-- Nav Bar Start -->
+        <div th:fragment="header_home" th:class="fixed-top">
+            <div class="nav" th:fragment="navbar">
+                <div class="container-fluid">
+                    <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+                        <a href="#" class="navbar-brand">MENU</a>
+                        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                            <div class="navbar-nav mr-auto">
+                                <a th:href="@{/api/products/all/1}" class="nav-item nav-link">Sản phẩm</a>
+                                <a href="#" class="nav-item nav-link" onclick="getNumberCartInEveryPage()">Giỏ hàng</a>
+                                <a th:href="@{/api/users/categories}" class="nav-item nav-link">Danh mục</a>
+                                <a href="#"  class="nav-item nav-link" onclick="getCreateProduct()"> Tạo sản phẩm</a>
+                                <a href="#" class="nav-item nav-link" onclick="topageHistory()">Tài khoản</a>
+                            </div>
+                            <div class="navbar-nav ml-auto">
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" th:text="${username}" id="usernameweb"></a>
+                                    <div class="dropdown-menu">
+<!--                                        <a href="#" class="dropdown-item">Login</a>-->
+                                        <a href="/api/logout" class="dropdown-item" onclick="removeInfo()">Đăng xuất</a>
+<!--                                        <a href="#" class="dropdown-item">Register</a>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <th:block th:fragment="search">
+            <div class="bottom-bar" >
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <div class="logo">
+                            <a th:href="@{/api/products/all/1}">
+                                <img th:src="@{/images/logo.png}" alt="Logo">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    </div>
+                    <div class="col-md-3">
+                        <div class="user">
+                            <a href="#" class="btn cart" onclick="tocard()">
+                                <i class="fa fa-shopping-cart"></i>
+                                <span class="numbercart" th:text="${numbercart}"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </th:block>
+        </div>
+        <!-- JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script src="/lib/easing/easing.min.js"></script>
+        <script src="/lib/slick/slick.min.js"></script>
+
+        <!-- Template Javascript -->
+        <script src="/images/main.js"></script>
+        <script th:inline="javascript">
+
+            /* Truyền username từ model xuống */
+            var username = [[${username}]];
+            var userId=[[${userId}]]
+            var numbercart=[[${numbercart}]]
+            /* Lưu username vào cookie */
+            document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "userId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "numbercart=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie="userId="+userId+"; expires=Wed, 18 Dec 2024 12:00:00 UTC; path=/"
+            document.cookie = "username=" + username + "; expires=Wed, 18 Dec 2024 12:00:00 UTC; path=/";
+            document.cookie="numbercart="+numbercart+"; expires=Wed, 18 Dec 2024 12:00:00 UTC; path=/"
+            getUserNameFromCookie();
+        </script>
+
+    </body>
+</html>

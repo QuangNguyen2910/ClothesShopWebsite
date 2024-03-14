@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Estore</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <style>
+        body {
+            background-image: url('/images/3.png');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+        }
+        .btn {
+            background-color: #D2B48C;
+            border: 2px solid #8B4513;
+            color: white;
+            margin: 5px;
+        }
+
+    </style>
+</head>
+<body>
+<div >
+
+    <a type="button" class="btn btn-outline-primary" th:href="@{/api/users/login}">Login</a>
+    <a type="button" class="btn btn-outline-primary" th:href="@{/api/users/register}">Register</a>
+    <a type="button" class="btn btn-outline-primary" th:href="@{/api/users/homepage}">Back to shop</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>P Store - Danh mục</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <!-- Favicon -->
+    <link th:href="@{images/favicon.ico}" rel="icon">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap"
+          rel="stylesheet">
+    <!-- CSS-->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/lib/slick/slick.css}" rel="stylesheet">
+    <link th:href="@{/lib/slick/slick-theme.css}" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link th:href="@{/css/stylehome.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="home/index::header_home"></div>
+<div style="height: 150px;"></div>
+<div class="breadcrumb-wrap">
+    <div class="container-fluid">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Pstore</a></li>
+            <li class="breadcrumb-item active">Danh mục</li>
+        </ul>
+    </div>
+</div>
+<!-- Checkout Start -->
+<div class="checkout">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="checkout-inner">
+                    <form class="billing-address mb-2" th:action="@{/api/categories/update/(id=${categoryEdit.id})}"
+                          method="post"
+                          th:object="${category}" th:if="${edit_category!=null}">
+                        <div th:if="${error}">
+                            <h3 style="color: red">Danh mục đã tồn tại</h3>
+                        </div>
+                        <h2>Chỉnh sửa</h2>
+                        <div class="row">
+                            <div class="col-md-6 mr-2">
+                                <label>Tên danh mục</label>
+                                <input class="form-control" type="text" th:placeholder="${categoryEdit.getName()}"
+                                       th:field="*{name}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary"
+                                style="background: #34ce57;border: #34ce57;color: black">Lưu
+                        </button>
+
+                    </form>
+                    <form class="billing-address mb-4" th:action="@{/api/categories/create}" method="post"
+                          th:object="${category}">
+                        <div th:if="${error}">
+                            <h3 style="color: red">Danh mục đã tồn tại</h3>
+                        </div>
+                        <h2>Thêm danh mục</h2>
+                        <div class="row">
+                            <div class="col-md-6 mr-2">
+                                <input class="form-control" type="text"  placeholder="Tên danh mục" th:field="*{name}" required title="Vui lòng điền tên danh mục.">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary"
+                                style="background: #34ce57;border: #34ce57;color: black">Tạo
+                        </button>
+                    </form>
+                    <h2>Tất cả danh mục</h2>
+                    <div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-dark">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên</th>
+                                    <th>Ngày</th>
+                                    <th>Hoạt động</th>
+                                    <th>Ẩn</th>
+                                    <th>Chỉnh sửa</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="category,id:${allcategories}">
+                                    <td th:text="${id.count}"></td>
+                                    <td th:text="${category.getName()}"></td>
+                                    <td th:text="${category.getCreatedDate()}"></td>
+                                    <td>
+                                        <div type="button" class="btn btn-outline-success"
+                                                style="color: #34ce57; border:1.5px solid #34ce57;background: #34ce57;color: black"
+                                                disabled th:if="${category.is_actived()}">Active
+                                        </div>
+                                        <a th:href="@{/api/categories/update/active/(id=${category.id})}" th:unless="${category.is_actived()}">
+                                            <div type="button" class="btn btn-outline-success"
+                                                    style="color: #34ce57; border:1.5px solid #34ce57" disabled
+                                                    >Active
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div type="button" class="btn btn-outline-success"
+                                                style="color: red; border:1.5px solid red;background: red ;color: black"
+                                                disabled th:unless="${category.is_actived()}">Hidden
+                                        </div>
+                                        <a th:href="@{/api/categories/update/delete/(id=${category.id})}" th:if="${category.is_actived()}">
+                                            <div type="button" class="btn btn-outline-danger"
+                                                    style="color: red; border:1.5px solid red" disabled
+                                                    >Hidden
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/api/categories/edit/(id=${category.id})}">
+                                            <ion-icon name="create-outline"></ion-icon>
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="checkout-inner">
+                    <div class="checkout-summary">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Danh mục</th>
+                                <th scope="col">Số lượng sản phẩm</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="count:${countProductByCategory}">
+                                <th scope="row" th:text="${allcategories.get(count.getCategoryId() - 1).getName()}"></th>
+                                <td th:text="${count.getCount()}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Footer-->
+<div class="footer-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 copyright">
+                <p>Copyright &copy; Group 4.03</p>
+            </div>
+
+            <div class="col-md-6 template-by">
+                <a href="https://portal.ptit.edu.vn/">Posts and Telecommunications Institute of Technology</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Back to Top -->
+<a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+
+<!-- JavaScript-->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/lib/easing/easing.min.js"></script>
+<script src="/lib/slick/slick.min.js"></script>
+
+<!-- Template Javascript -->
+<script src="/images/main.js"></script>
+<script>
+    getUserNameFromCookie()
+</script>
+</body>
+</html>

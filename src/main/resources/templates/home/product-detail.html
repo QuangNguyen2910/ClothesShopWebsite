@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+    <head>
+        <meta charset="utf-8">
+        <title>P Store - Chi tiết sản phẩm</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+        <!-- Favicon -->
+        <link th:href="@{/images/favicon.ico}" rel="icon">
+        <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+        <!--    <link href="/styles.css"/>-->
+        <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap" rel="stylesheet">
+
+        <!-- CSS -->
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+        <link th:href="@{/lib/slick/slick.css}" rel="stylesheet">
+        <link th:href="@{/lib/slick/slick-theme.css}" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link th:href="@{/css/stylehome.css}" rel="stylesheet">
+        <style>
+            .rating .fa-star {
+                color: #ccc; /* Màu mặc định của ngôi sao */
+                cursor: pointer;
+            }
+
+            .rating .fa-star.selected {
+                color: rgb(256,108,100); /* Màu vàng cho ngôi sao đã chọn */
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div th:replace="home/index::header_home"></div>
+        <div style="height: 150px;"></div>
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Pstore</a></li>
+                    <li class="breadcrumb-item"><a href="#">Sản phẩm</a></li>
+                    <li class="breadcrumb-item active">Chi tiết</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Product Detail Start -->
+        <div class="product-detail">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="product-detail-top">
+                            <div class="row align-items-center">
+                                <input type="hidden" th:value="${product.id}" class="productId_addToCart">
+                                <div class="col-md-5">
+                                    <div class="product-slider-single normal-slider">
+                                        <img th:src = "${product.getImage_url()}" alt="Hình ảnh">
+                                        <img th:src = "${product.getImage_url()}" alt="Hình ảnh">
+                                        <img th:src = "${product.getImage_url()}" alt="Hình ảnh">
+                                        <img th:src = "${product.getImage_url()}" alt="Hình ảnh">
+                                        <img th:src = "${product.getImage_url()}" alt="Hình ảnh">
+                                    </div>
+                                    <div class="product-slider-single-nav normal-slider">
+                                        <div class="slider-nav-img"><img th:src = "${product.getImage_url()}" alt="Hình ảnh"></div>
+                                        <div class="slider-nav-img"><img th:src = "${product.getImage_url()}" alt="Hình ảnh"></div>
+                                        <div class="slider-nav-img"><img th:src = "${product.getImage_url()}" alt="Hình ảnh"></div>
+                                        <div class="slider-nav-img"><img th:src = "${product.getImage_url()}" alt="Hình ảnh"></div>
+                                        <div class="slider-nav-img"><img th:src = "${product.getImage_url()}" alt="Hình ảnh"></div>
+                                        <div class="slider-nav-img"><img th:src = "${product.getImage_url()}" alt="Hình ảnh"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <div th:if="${findProductInCart}">
+                                        <h4 class="text-success">Sản phẩm đã có trong giỏ hàng</h4>
+                                    </div>
+                                    <div class="product-content">
+
+                                        <div class="title"><h2 th:text="${product.name}"></h2></div>
+                                        <div class="ratting">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="price">
+                                            <h4>Giá:</h4>
+                                            <p th:text="${product.getSalePriceFormat()}"></p>
+                                                <span th:text="${product.getCostPriceFormat()}">$149</span>
+                                        </div>
+
+                                        <div class="quantity">
+                                            <h4>Số lượng:</h4>
+                                            <div class="qty">
+                                                <button class="btn-minus"><i class="fa fa-minus"></i></button>
+                                                <input type="text" value="1" class="inputquantity">
+                                                <button class="btn-plus"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="p-size">
+                                            <div style="display:inline-block">
+                                                <h4>Màu sắc:</h4>
+                                                <div class="abc size-options btn-group btn-group-sm">
+                                                    <input type="radio" name="size" id = "s" checked = "checked" value = "S"/>
+                                                    <label for="s">S
+                                                    </label>
+                                                    <input type="radio" name="size" id = "m" value = "M"/>
+                                                    <label for="m">M
+                                                    </label>
+                                                    <input type="radio" name="size" id = "l" value = "L"/>
+                                                    <label for="l">L
+                                                    </label>
+                                                    <input type="radio" name="size" id = "xl" value = "XL"/>
+                                                    <label for="xl">XL
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-color">
+                                            <div>
+                                                <h4>Màu sắc:</h4>
+                                                <div class="abc size-options btn-group btn-group-sm">
+                                                    <input type="radio" name="color" id = "red" checked = "checked" value = "Đỏ"/>
+                                                    <label for="red">Đỏ
+                                                    </label>
+                                                    <input type="radio" name="color" id = "white" value = "Trắng"/>
+                                                    <label for="white">Trắng
+                                                    </label>
+                                                    <input type="radio" name="color" id = "blue" value = "Xanh"/>
+                                                    <label for="blue">Xanh
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="action">
+                                            <button class="btn btnAddProductToCart" href="#"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</button>
+                                            <button style="margin-left: 7px" onclick="getNumberCartInEveryPage()" class="btn btnAddProductToCart"><i class="fa fa-shopping-bag"></i>Mua ngay</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row product-detail-bottom">
+                            <div class="col-lg-12">
+                                <ul class="nav nav-pills nav-justified">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-toggle="pill" href="#description" data-target="#description">Mô tả sản phẩm</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="pill" href="#reviews" data-target="#reviews">Đánh giá</a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div id="description" class="container tab-pane active">
+                                        <p th:text="${product.getDescription()}"></p>
+                                    </div>
+                                    <div id="reviews" class="container comment-form container tab-pane fade">
+                                        <div id="box_comment_product">
+                                            <div th:each="comment:${comments}" id="chatbox" class="reviewer" th:class="${'commentParent_'+comment.getId() }" th:style="'margin-left: ' + ${comment.getStep()*30} + 'px;'" >
+                                                <div class="boxmessage col-sm-12 row form" style="display: flex;flex-direction: column;" id="usersendMessage" >
+                                                    <div class="avatar reviewer" id="avatarDiv" style="display: flex; align-items: center;" >
+                                                        <br>
+                                                        <span style="color: #FF6F61; font-size: 18px; font-family: 'Open Sans', sans-serif; font-weight:600" th:text="${comment.getUserName()} + ' - '"></span>
+                                                        <h6 th:text="${comment.getDateCreate()}" style="font-size: 14px; color: #666666; font-weight: 400;font-family: 'Open Sans', sans-serif; margin: 0px; margin-left: 2.5px"></h6>
+
+                                                    </div>
+                                                    <div id="contentComent" role="alert" style="margin-top: 8px;" th:text="${comment.getContent()}">
+                                                    </div>
+                                                    <button th:onclick="showFormRepComment([[${comment.getId()}]])" style="width: max-content; display: block; margin-top: 15px" class="btn1_repcomment col-sm-12 row form">
+                                                        Rep
+                                                    </button>
+
+                                                    <div style="width: 100%;display: none" th:class="${'form-rep-comment'+comment.getId()}">
+                                                        <input name="comment" placeholder="Viết bình luận" th:id="${'textarea-comment-rep'+comment.getId()}"></input>
+                                                        <button type="submit" id="btn-comment-rep" th:onclick="postRepComment([[${comment.getId()}]])">Phản hồi</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div  class="comment-form reviews-submit">
+                                            <h4>Đánh giá sản phẩm:</h4>
+                                            <div class="rating">
+                                                <i class="fa fa-star" data-star="1"></i>
+                                                <i class="fa fa-star" data-star="2"></i>
+                                                <i class="fa fa-star" data-star="3"></i>
+                                                <i class="fa fa-star" data-star="4"></i>
+                                                <i class="fa fa-star" data-star="5"></i>
+                                            </div>
+                                            <p id="result" style="display: none"></p>
+
+                                            <div style="width: 100%" class="col-sm-12 row form">
+                                                <textarea style="display: block; width: 100%" name="comment" placeholder="Viết đánh giá" id="textarea-comment"></textarea>
+                                                <button style="display: block; width:100%; margin-top:10px;" type="submit" id="btn-comment" th:onclick="postFirstCommentInPost([[${productId}]])">Gửi</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Bar Start -->
+                    <div class="col-lg-4 sidebar">
+                        <div class="sidebar-widget category">
+                            <h2 class="title">Danh mục</h2>
+                            <nav class="navbar bg-light">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item" th:each="category:${categories}">
+                                        <a class="nav-link" href="#" th:text="${category.getName()}"></a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div class="sidebar-widget widget-slider">
+                            <div class="sidebar-slider normal-slider">
+                                <div class="col-md-4" th:each="product:${products}">
+                                    <div class="product-item">
+                                        <div class="product-title">
+                                            <a href="#" th:text="${product.getName()}"></a>
+                                            <div class="ratting">
+                                                <i class="far fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </div>
+
+                                        </div>
+                                        <div class="product-image">
+                                            <a th:href="product-detail.html">
+                                                <img th:src="${product.getImage_url()}" alt="Hình ảnh">
+                                            </a>
+                                            <div class="product-action">
+                                                <input type="hidden" th:value="${product.id}"/>
+                                                <a href="#"><i class="fa fa-heart"></i></a>
+                                                <a th:onclick="searchProductById([[${product.id}]])"><i class="fa fa-search"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="product-price">
+                                            <h3 th:text="${product.getSalePriceFormat()}"><span>$</span>99</h3>
+                                            <a class="btn" th:onclick="searchProductById([[${product.id}]])"><i class="fa fa-shopping-cart"></i>Chi tiết</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 copyright">
+                        <p>Copyright &copy; Group 4.03</p>
+                    </div>
+
+                    <div class="col-md-6 template-by">
+                        <a href="https://portal.ptit.edu.vn/">Posts and Telecommunications Institute of Technology</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Back to Top -->
+        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+
+        <!-- JavaScript Libraries -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script th:src="@{/lib/easing/easing.min.js}"></script>
+        <script th:src="@{/lib/slick/slick.min.js}"></script>
+
+        <!-- Template Javascript -->
+        <script th:src="@{/images/main.js}"></script>
+    <script th:inline="javascript">
+        getUserNameFromCookie()
+        const form = document.querySelector('.comment-form');
+        const textarea = form.querySelector('textarea');
+        const comments = document.querySelector('.comments');
+        const boxcomment=document.querySelector('.box_comment_product');
+        const userId=getUserId();
+        const productId=[[${product.id}]];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.rating .fa-star');
+            const result = document.getElementById('result');
+            stars.forEach(function(star) {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(star.getAttribute('data-star'));
+                    console.log('Đã đánh giá ' + rating + ' sao.');
+
+                    // Thêm hoặc xóa lớp 'selected' để thay đổi màu sắc của ngôi sao
+                    stars.forEach(function(s) {
+                        s.classList.remove('selected');
+                    });
+
+                    for (let i = 0; i < rating; i++) {
+                        stars[i].classList.add('selected');
+                    }
+
+                    // Hiển thị số sao đã được chọn
+                    result.textContent = rating;
+                });
+            });
+        });
+
+        function getUserId(){
+            var cookies = document.cookie.split(';');
+            var userId='';
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.startsWith('userId=')) {
+                    userId = cookie.substring('userId='.length, cookie.length);
+                    break;
+                }
+            }
+            return userId;
+        }
+        function buy_product(){
+            var userId = ''
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.startsWith('userId=')) {
+                    userId = cookie.substring('userId='.length, cookie.length);
+                    break;
+                }
+            }
+            var url="/api/history/add/"+userId;
+            $.ajax({
+                type:"POST",
+                url:url,
+                success:function (res){
+                    console.log(res);
+                    if(res=="add fail"){
+
+                    }else{
+                        removeAll_list_cartItem()
+                    }
+                },
+                error:function (xhr,status,error){
+
+                }
+            })
+
+        }
+        function removeAll_list_cartItem(){
+            document.querySelectorAll(".list_cartItem").forEach((item)=>{
+                item.remove();
+            });
+        }
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            //create div
+            const comment = document.createElement('div');
+            comment.classList.add('comment');
+            const text = document.createElement('p');
+            text.textContent = textarea.value;
+            //
+            comment.appendChild(text);
+            boxcomment.appendChild(comment);
+            console.log(text)
+            textarea.value = '';
+        });
+        connect();
+        setCurrentProduct([[${product.id}]])
+    </script>
+    </body>
+</html>

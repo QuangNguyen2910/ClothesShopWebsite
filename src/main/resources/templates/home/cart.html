@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="home/index::head">
+</head>
+<body>
+<div th:replace="home/index::header_home"></div>
+<div style="height: 150px;"></div>
+<div class="breadcrumb-wrap">
+    <div class="container-fluid">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Pstore</a></li>
+            <li class="breadcrumb-item active">Giỏ hàng</li>
+        </ul>
+    </div>
+</div>
+
+<div class="cart-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="cart-page-inner">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Số lượng</th>
+                                <th>Màu sắc</th>
+                                <th>Kích thước</th>
+                                <th>Thành tiền</th>
+                                <th>Xoá</th>
+                            </tr>
+                            </thead>
+                            <tbody class="align-middle">
+                            <tr th:each="cartITem:${cartItems}" class="list_cartItem">
+                                <td>
+                                    <div class="img">
+                                        <a href="#"><img
+                                                th:src="${cartITem.getProductResponse().getImage_url()}"
+                                                alt="Image"></a>
+                                        <p th:text="${cartITem.getProductResponse().name}"></p>
+                                    </div>
+                                </td>
+                                <td th:text="${cartITem.getProductResponse().getSalePriceFormat()}"></td>
+                                <td>
+                                    <div class="qtyincart">
+                                        <button class="btn-minus"><i class="fa fa-minus"></i></button>
+                                        <input type="text" th:value="${cartITem.getQuantity()}" class="valuequantity">
+                                        <button class="btn-plus"><i class="fa fa-plus"></i></button>
+                                        <input type="hidden" th:value="${cartITem.id}" class="cartIdInCard"/>
+                                    </div>
+                                </td>
+                                <td th:text="${cartITem.getColor()}"></td>
+                                <td th:text="${cartITem.getSize()}"></td>
+                                <td th:id="totalmaney+${cartITem.getId()}" th:class="totalmaney" th:text="${cartITem.totalInCartItem()} + '₫'" >
+                                </td>
+                                <td class="td_removecard">
+                                    <button class="btn_removecart"><i class="fa fa-trash"></i>
+                                        <input type="hidden" th:value="${cartITem.getId()}" id="cartIdInCardFirst"/>
+                                    </button>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cart-page-inner">
+                    <div class="row">
+                        <div class="col-md-12 align-items-center" id="valid-show-notice" style="display: none; margin-bottom: 10px">
+                            <h6 class="text-danger">Vui lòng nhập đầy đủ thông tin về số điện thoại và địa chỉ nhận hàng</h6>
+                        </div>
+                        <div class="col-md-12 align-items-center" id="wrong-show-notice" style="display: none; margin-bottom: 10px">
+                            <h6 class="text-danger">Mã giảm giá không hợp lệ hoặc đã hết hạn sử dụng.</h6>
+                        </div>
+                        <div class="col-md-12 align-items-center" id="accept-show-notice" style="display: none; margin-bottom: 10px">
+                            <h6 class="text-danger">Áp dụng mã giảm giá thành công!</h6>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="coupon">
+                                <input type="text" id="discount-context" placeholder="Mã giảm giá">
+                                <button onclick="get_discount()">Áp dụng</button>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="cart-summary">
+                                <div class="cart-content">
+                                    <h2>Tổng<span class="grandtotalcart"></span></h2>
+                                </div>
+                                <div class="cart-btn">
+                                    <button th:if="${user.getPhoneNumber() != null && user.getAddress() != null}" onclick="buy_product()">Mua ngay</button>
+
+                                    <button th:if="${user.getPhoneNumber() == null || user.getAddress() == null}" onclick="check_account()">Mua ngay</button>
+                                </div>
+                                <div style="margin-bottom:150px">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer-->
+<div class="footer-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 copyright">
+                <p>Copyright &copy; Group 4.03</p>
+            </div>
+
+            <div class="col-md-6 template-by">
+                <a href="https://portal.ptit.edu.vn/">Posts and Telecommunications Institute of Technology</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Back to Top -->
+<a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+
+<!-- JavaScript-->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="/lib/easing/easing.min.js"></script>
+<script src="/lib/slick/slick.min.js"></script>
+
+<!--Template Javascript -->
+<script src="/images/main.js"></script>
+</body>
+<script th:inline="javascript">
+    var userAddress = [[${user.getAddress()}]];
+    var userPhoneNumber = [[${user.getPhoneNumber()}]];
+    var discountMoney = 0;
+    sumTotal();
+    function check_account() {
+        if (userAddress == null || userPhoneNumber == null) {
+            document.getElementById("valid-show-notice").style.display = "block";
+            document.getElementById("wrong-show-notice").style.display = "none";
+            document.getElementById("accept-show-notice").style.display = "none";
+
+        }
+    }
+
+    function get_discount(){
+        var discountName = document.getElementById("discount-context").value;
+        var url="/api/carts/"+ discountName;
+        $.ajax({
+            type:"POST",
+            url:url,
+            success:function (res){
+                if(discountMoney == 0) discountMoney += res;
+                if (discountName != null && discountMoney == 0) {
+                    document.getElementById("wrong-show-notice").style.display = "block";
+                    document.getElementById("valid-show-notice").style.display = "none";
+                    document.getElementById("accept-show-notice").style.display = "none";
+                } else if(discountMoney > 0) {
+                    document.getElementById("valid-show-notice").style.display = "none";
+                    document.getElementById("wrong-show-notice").style.display = "none";
+                    document.getElementById("accept-show-notice").style.display = "block";
+                }
+                sumTotal();
+                console.log(discountName)
+                console.log([[${wrong}]])
+            },
+            error:function (xhr,status,error){
+                console.log("nol");
+            }
+        })
+    }
+
+    $('.qtyincart button').on('click', function () {
+        var $button = $(this);
+        var oldValue = $button.parent().find('input').eq(0).val();
+        if ($button.hasClass('btn-plus')) {
+            var newVal = parseFloat(oldValue) + 1;
+        } else {
+            if (oldValue > 0) {
+                var newVal = parseFloat(oldValue) - 1;
+            } else {
+                newVal = 0;
+            }
+        }
+        $button.parent().find('input').eq(0).val(newVal);
+        var cardId = $button.parent().find('.cartIdInCard').val();
+        var url = "/api/shoppingcarts/update/" + cardId + "/" + newVal;
+
+        $.ajax({
+                type: "POST",
+                url: url,
+                success: function (res) {
+                    var classcart = "#totalmaney" + cardId;
+                    if (res != null) {
+                        $(classcart).text(res)
+                    }
+                    sumTotal()
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(errorThrown)
+                }
+            }
+        )
+    });
+
+    function formatNumberWithCommas(number) {
+        let formattedNumber = number.toString();
+        formattedNumber = formattedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return formattedNumber;
+    }
+
+    function sumTotal() {
+        var total = 0;
+        var numbercart=0;
+        $(".totalmaney").each(function (index, element) {
+            total += parseFloat(element.innerHTML)
+            numbercart++
+        })
+        if(total - discountMoney > 0) total -= discountMoney;
+        else total = 0;
+        chageFragment(numbercart)
+        changeNumberCart(numbercart)
+        numbercart=0;
+
+        $(".grandtotalcart").text(formatNumberWithCommas(total) + '₫')
+    }
+
+
+    $(".td_removecard").click(function (e) {
+        var card=$(this).parent();
+        var cartId = $(this).find("#cartIdInCardFirst").val();
+        var url="/api/shoppingcarts/delete/"+cartId;
+        $.ajax({
+            type: "DELETE",
+            url:url,
+            success:function (res){
+                card.remove()
+                sumTotal()
+            },
+            error:function (xhr,status,error){
+                console.log("err",cartId)
+            }
+        })
+    })
+    function buy_product(){
+        var cartItems = document.querySelectorAll(".list_cartItem");
+
+        if (cartItems.length > 0) {
+            alert("Đơn hàng đã đặt thành công, vui lòng kiểm tra tin nhắn trong hòm thư");
+        }
+        var userId = ''
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.startsWith('userId=')) {
+                userId = cookie.substring('userId='.length, cookie.length);
+                break;
+            }
+        }
+        var url="/api/history/add/"+userId+"/"+discountMoney;
+        $.ajax({
+            type:"POST",
+            url:url
+            // ,data: {money : discountMoney}
+            ,success:function (res){
+                console.log(res);
+                if(res=="add fail"){
+                }else{
+                    removeAll_list_cartItem()
+                }
+            },
+            error:function (xhr,status,error){
+
+            }
+        })
+
+
+    }
+
+    function removeAll_list_cartItem(){
+        document.querySelectorAll(".list_cartItem").forEach((item)=>{
+            item.remove();
+        });
+    }
+    getUserNameFromCookie()
+</script>
+</html>

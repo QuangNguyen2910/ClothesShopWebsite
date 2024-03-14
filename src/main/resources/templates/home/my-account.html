@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="utf-8">
+    <title>P Store - Tài khoản</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link th:href="@{/images/favicon.ico}" rel="icon">
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <!--    <link href="/styles.css"/>-->
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/lib/slick/slick.css}" rel="stylesheet">
+    <link th:href="@{/lib/slick/slick-theme.css}" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link th:href="@{/css/stylehome.css}" rel="stylesheet">
+</head>
+
+<body>
+<div th:replace="home/index::header_home"></div>
+<div style="margin-top: 10rem"></div>
+<div class="breadcrumb-wrap">
+    <div class="container-fluid">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Pstore</a></li>
+            <li class="breadcrumb-item ">Tài khoản</li>
+        </ul>
+    </div>
+</div>
+
+<!-- My Account Start -->
+<div class="my-account">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link active" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab"><i class="fa fa-shopping-bag"></i>Đơn hàng</a>
+                    <a class="nav-link" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i>Thông tin tài khoản</a>
+                    <a class="nav-link " id="payment-nav" data-toggle="pill" href="#pass-tab" role="tab"><i class="fa fa-key"></i>Mật khẩu</a>
+
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="tab-content">
+
+                    <div class="tab-pane fade show active" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-dark">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Số lượng</th>
+                                    <th>Kích thước</th>
+                                    <th>Màu sắc</th>
+                                    <th>Thành tiền</th>
+                                    <th>Chi tiết</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="cart,index:${history_card}">
+                                    <td th:text="${index.count}"></td>
+                                    <td th:text="${cart.getProductResponse().getName()}">Product Name</td>
+                                    <td>
+                                        <img th:src="${cart.getProductResponse().getImage_url()}" style="width: 25px;height: 25px">
+                                    </td>
+                                    <td th:text="${cart.boughtAt}"></td>
+                                    <td th:text="${cart.quantity}"></td>
+                                    <td th:text="${cart.size}"></td>
+                                    <td th:text="${cart.color}"></td>
+                                    <td th:text="${cart.sumTotalInCartHistoryFormat()}"></td>
+                                    <td><button class="btn" th:onclick="searchProductById([[${cart.getProductResponse().getId()}]])">Xem</button></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-bottom:280px"></div>
+                    </div>
+                    <div class="tab-pane fade" id="payment-tab" role="tabpanel" aria-labelledby="payment-nav">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-dark">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Số lượng</th>
+                                    <th>Kích thước</th>
+                                    <th>Màu sắc</th>
+                                    <th>Thành tiền</th>
+                                    <th>Chi tiết</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="cart,index:${history_card}">
+                                    <td th:text="${index.count}"></td>
+                                    <td th:text="${cart.getProductResponse().getName()}">Product Name</td>
+                                    <td>
+                                        <img th:src="${cart.getProductResponse().getImage_url()}" style="width: 25px;height: 25px">
+                                    </td>
+                                    <td th:text="${cart.boughtAt}"></td>
+                                    <td th:text="${cart.quantity}"></td>
+                                    <td th:text="${cart.size}"></td>
+                                    <td th:text="${cart.color}"></td>
+                                    <td th:text="${cart.sumTotalInCartHistoryFormat()}"></td>
+                                    <td><button class="btn" th:onclick="searchProductById([[${cart.getProductResponse().getId()}]])">Xem</button></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <form class="tab-pane fade" id="account-tab" role="tabpanel" aria-labelledby="account-nav"
+                          th:action="@{/api/users/update/(id=${user.id})}" method="post" th:object="${users}">
+                        <h4>Thay đổi thông tin</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="usern">Tên đăng nhập:</label>
+                                <input id = "usern" class="form-control" type="text" th:placeholder="${user.getUsername()}" th:field="*{username}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="emai">Địa chỉ email:</label>
+                                <input id = "emai" class="form-control" type="email" th:placeholder="${user.getEmail()}" th:field="*{email}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="add">Địa chỉ:</label>
+                                <input id="add" class="form-control" type="text" th:placeholder="${user.getAddress() != null ?
+                                            user.getAddress() : 'Địa chỉ'}" th:field="*{address}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone">Số điện thoại:</label>
+                                <span id="phone-error" style="color: red;"></span>
+                                <input id = "phone" class="form-control" type="text" pattern="0[0-9]{6, 12}" th:placeholder="${user.getPhoneNumber() != null ?
+                                            user.getPhoneNumber() : 'Số điện thoại'}" th:field="*{phoneNumber}"  oninput="validatePhoneNumber(this)">
+
+                            </div>
+                            <div class="col-md-12">
+                                <button class="btn" type="submit">Cập nhật</button>
+                                <br><br>
+                            </div>
+                        </div>
+                    </form>
+
+<!--                    <form id="pass-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="account-nav">-->
+
+                        <div id="pass-tab" class="tab-pane fade" role="tabpanel" aria-labelledby="payment-nav">
+                            <h4>Đổi mật khẩu</h4>
+                            <div class="col-md-12 align-items-center" id="error-pass-1" style="display: none; margin-bottom: 10px">
+                                <h6 class="text-danger" >Sai mật khẩu!</h6>
+                            </div>
+                            <div class="col-md-12 align-items-center" id="error-pass-2" style="display: none; margin-bottom: 10px">
+                                <h6 class="text-danger" >Mật khẩu không khớp!</h6>
+                            </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input class="form-control" type="password" name="pass-now" id="pass-now" placeholder="Mật khẩu hiện tại" oninput="validateInput(this)">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input class="form-control" type="password" name="pass-1" id="pass-1" placeholder="Mật khẩu mới" oninput="validateInput(this)">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input class="form-control" type="password" name="pass-2" id="pass-2" placeholder="Nhập lại mật khẩu" oninput="validateInput(this)">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <button class="btn" onclick="check_pass()">Lưu thay đổi</button>
+                                        <br><br>
+                                    </div>
+                                </div>
+                        </div>
+                    <div style="margin-bottom:130px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Footer -->
+<div class="footer-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 copyright">
+                <p>Copyright &copy; Group 4.03</p>
+            </div>
+
+            <div class="col-md-6 template-by">
+                <a href="https://portal.ptit.edu.vn/">Posts and Telecommunications Institute of Technology</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/lib/easing/easing.min.js}"></script>
+<script th:src="@{/lib/slick/slick.min.js}"></script>
+<script th:src="@{/images/main.js}"></script>
+<script th:inline="javascript">
+    function validatePhoneNumber(input) {
+        var phoneNumber = input.value;
+        var isValid = /^0[0-9]{6,12}$/.test(phoneNumber);
+
+        if (!isValid) {
+            input.setCustomValidity('Số điện thoại phải bắt đầu từ 0 và có từ 7 - 13 chữ số.');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+    function validateInput(input) {
+        var inputField = input.value.trim();
+
+        if (inputField === '') {
+            input.setCustomValidity('Vui lòng điền vào đây!');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+    function check_pass(){
+        var passNow = document.getElementById("pass-now").value;
+        var pass1 = document.getElementById("pass-1").value;
+        var pass2 = document.getElementById("pass-2").value;
+        console.log(passNow)
+        var userId = ''
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.startsWith('userId=')) {
+                userId = cookie.substring('userId='.length, cookie.length);
+                break;
+            }
+        }
+        var url="/api/users/change-password/";
+        $.ajax({
+            type:"POST",
+            url:url,
+            data:{userId : userId, passNow : passNow, pass1 : pass1, pass2 : pass2},
+            success:function (res){
+                if(res == 0){
+                    alert("Đổi mật khẩu thành công!")
+                    window.location.href = 'http://localhost:3000/api/history-page/' + userId;
+                }
+                else if(res == 1 && pass1 != "" && pass2 != "" && passNow != ""){
+                    document.getElementById("error-pass-1").style.display = "block";
+                    document.getElementById("error-pass-2").style.display = "none";
+                }
+                else if(res == 2 && pass1 != "" && pass2 != "" && passNow != ""){
+                    document.getElementById("error-pass-1").style.display = "none";
+                    document.getElementById("error-pass-2").style.display = "block";
+                }
+            },
+            error:function (xhr,status,error){
+                console.log("nol");
+            }
+        })
+    }
+    getUserNameFromCookie();
+</script>
+
+</body>
+</html>
